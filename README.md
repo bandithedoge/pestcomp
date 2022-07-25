@@ -1,6 +1,6 @@
 # PestCömp
 
-https://github.com/bandithedoge/pestcomp/blob/master/assets/demo.mp4?raw=true [^song]
+https://user-images.githubusercontent.com/26331682/180800956-4a0db6c4-36d7-48fb-938d-d39dac427a2b.mp4 [^song]
 
 Forget your Pro-C2, Presswerk or Shadow Hills Mastering Compressor. If your song sounds like shit, those compressors could never make it sound less shit. PestCömp does just that by carefully analyzing the input signal's frequencies and turning them into their closest certified good-sounding counterparts. Not only that, it applies slight dynamics processing through extremely accurate analog modelling of an unplugged tape deck.
 
