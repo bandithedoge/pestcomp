@@ -1,0 +1,15 @@
+[package]
+name = "pestcomp"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib"]
+name = "pestcomp"
+
+[dependencies]
+baseview = {git = "https://github.com/RustAudio/baseview.git", rev = "f6e99e9aa6f5aeb6b721cb05e4d882a51d995909"}
+egui = "0.15"
+egui-baseview = {git = "https://github.com/BillyDM/egui-baseview.git", branch = "main"}
+raw-window-handle = "0.3"
+vst = "0.3"
