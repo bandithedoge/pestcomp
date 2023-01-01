@@ -1,4 +1,9 @@
 target
 .direnv
 result
+result-*
 pestcomp.zip
+.cache/
+build/
+bin/
+compile_commands.json

@@ -2,29 +2,44 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     flake-utils.url = "github:numtide/flake-utils";
-    naersk.url = "github:nix-community/naersk";
   };
   outputs = {
     self,
     nixpkgs,
     flake-utils,
-    naersk,
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
-    in rec {
-      packages.default = naersk.lib.${system}.buildPackage {
-        pname = "pestcomp";
-        root = ./.;
 
-        nativeBuildInputs = with pkgs; [rustc cargo pkg-config python3];
-        buildInputs = with pkgs; [libGL xorg.libX11 xorg.libXcursor xorg.xcbutilwm];
+      drv = pkgs':
+        pkgs'.stdenv.mkDerivation {
+          pname = "PestComp";
+          version = "2.0.0";
+          src = ./.;
 
-        copyBins = false;
-        copyLibs = true;
+          installPhase = ''
+            cp -r bin $out
+          '';
+
+          nativeBuildInputs = with pkgs; [
+            pkg-config
+          ];
+
+          buildInputs = with pkgs';
+            []
+            ++ (pkgs'.lib.optionals pkgs'.stdenv.targetPlatform.isLinux (with pkgs'; [xorg.libX11]))
+            ++ (pkgs'.lib.optionals pkgs'.stdenv.targetPlatform.isWindows (with pkgs'; [windows.pthreads]));
+        };
+    in {
+      packages = {
+        default = drv pkgs;
+        windows = drv pkgs.pkgsCross.mingwW64;
       };
-      devshell = pkgs.mkShell {
-        inherit (packages.default) nativeBuildInputs buildInputs;
+
+      devShells.default = pkgs.mkShell {
+        nativeBuildInputs = (drv pkgs).nativeBuildInputs ++ (with pkgs; [bear clang-tools]);
+
+        inherit (drv pkgs) buildInputs;
       };
     });
 }
