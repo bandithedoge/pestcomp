@@ -10,36 +10,26 @@
   }:
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = nixpkgs.legacyPackages.${system};
+    in rec {
+      packages.default = pkgs.stdenv.mkDerivation {
+        pname = "PestComp";
+        version = "2.0.0";
+        src = ./.;
 
-      drv = pkgs':
-        pkgs'.stdenv.mkDerivation {
-          pname = "PestComp";
-          version = "2.0.0";
-          src = ./.;
+        nativeBuildInputs = with pkgs; [
+          pkg-config
+        ];
 
-          installPhase = ''
-            cp -r bin $out
-          '';
+        buildInputs = with pkgs; (lib.optionals stdenv.targetPlatform.isLinux (with pkgs; [xorg.libX11]));
 
-          nativeBuildInputs = with pkgs; [
-            pkg-config
-          ];
+        makeFlags = ["PREFIX=$(out)"];
 
-          buildInputs = with pkgs';
-            []
-            ++ (pkgs'.lib.optionals pkgs'.stdenv.targetPlatform.isLinux (with pkgs'; [xorg.libX11]))
-            ++ (pkgs'.lib.optionals pkgs'.stdenv.targetPlatform.isWindows (with pkgs'; [windows.pthreads]));
-        };
-    in {
-      packages = {
-        default = drv pkgs;
-        windows = drv pkgs.pkgsCross.mingwW64;
+        enableParallelBuilding = true;
       };
 
       devShells.default = pkgs.mkShell {
-        nativeBuildInputs = (drv pkgs).nativeBuildInputs ++ (with pkgs; [bear clang-tools]);
-
-        inherit (drv pkgs) buildInputs;
+        inherit (packages.default) buildInputs;
+        nativeBuildInputs = packages.default.nativeBuildInputs ++ (with pkgs; [bear clang-tools]);
       };
     });
 }
